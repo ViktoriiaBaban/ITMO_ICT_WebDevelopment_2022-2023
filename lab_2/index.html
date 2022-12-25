@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>ЛР 2 - Лабораторные работы Бабан Виктории</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/docco.min.css">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Лабораторные работы Бабан Виктории</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Labs <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../lab_1/" class="dropdown-item">ЛР 1</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">ЛР 2</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../lab_1/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" class="nav-link disabled">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#2" class="nav-link">Лабораторная работа 2</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#_1" class="nav-link">Вариант "Отели"</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#html-" class="nav-link">HTML-код страниц</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="2">Лабораторная работа 2</h1>
+<h2 id="_1">Вариант "Отели"</h2>
+<ul>
+<li>models.py</li>
+</ul>
+<pre><code>from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
+from django.db import models
+
+class Hotel(models.Model):
+    name = models.CharField(&quot;Название отеля&quot;, max_length=50, primary_key=True)
+    owner = models.CharField(&quot;Владелец отеля&quot;, max_length=50)
+    address = models.CharField(&quot;Адрес отеля&quot;, max_length=100)
+
+class Room(models.Model):
+    TYPE_ROOM = [
+        ('S', 'Стандарт'),
+        ('С', 'Комфорт'),
+        ('L', 'Люкс'),
+        ('F', 'Семейный'),
+        ('P', 'Президентский'),
+        ('A', 'Апартаменты')
+    ]
+
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, verbose_name=&quot;Отель&quot;)
+    number = models.IntegerField(&quot;Номер комнаты&quot;)
+    description = models.CharField(&quot;Описание номера&quot;, max_length=1000)
+    type_room = models.CharField(&quot;Тип номера&quot;, max_length=1, choices=TYPE_ROOM)
+    beds = models.PositiveSmallIntegerField(&quot;Количество спальных мест&quot;, validators=[MinValueValidator(1)])
+    price = models.PositiveIntegerField(&quot;Стоимость номера&quot;)
+
+    class Meta:
+        # One hotel can't have two rooms with the same number
+        unique_together = ('hotel', 'number')
+
+
+class Guest(models.Model):
+    last_name = models.CharField(&quot;Фамилия&quot;, max_length=30, null=False)
+    first_name = models.CharField(&quot;Имя&quot;, max_length=30, null=False)
+    passport = models.CharField(&quot;Номер паспорта&quot;, primary_key=True, max_length=30)
+
+class Booking(models.Model):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, verbose_name=&quot;Отель&quot;)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    guest = models.ForeignKey(Guest, on_delete=models.CASCADE)
+    date_start = models.DateField(&quot;Дата заезда&quot;)
+    date_end = models.DateField(&quot;Дата выезда&quot;)
+    total_price = models.PositiveIntegerField(&quot;Стоимость проживания&quot;, null=False)
+
+    @property
+    def days(self):
+        return (self.date_end - self.date_start).days
+
+    def check_date(self):
+        if self.date_start &gt;= self.date_end:
+            raise ValidationError(&quot;Конечная дата должна быть больше начальной!&quot;)
+
+    def save(self, *args, **kwargs):
+        self.total_price = self.room.price * self.days
+        super(Booking, self).save(*args, **kwargs)
+
+class Feedback(models.Model):
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, verbose_name=&quot;Код бронирования&quot;)
+    author = models.CharField(&quot;Укажите ваш ник&quot;, max_length=30)
+    rate = models.IntegerField(&quot;Оценка&quot;, default=0, validators=[MaxValueValidator(10), MinValueValidator(1)])
+    date_start = models.DateField(&quot;Дата заезда&quot;)
+    date_end = models.DateField(&quot;Дата выезда&quot;)
+    text = models.TextField(&quot;Комментарий&quot;, null=False)
+
+    def save(self, *args, **kwargs):
+        self.date_start = self.booking.date_start
+        self.date_end = self.booking.date_end
+        super(Feedback, self).save(*args, **kwargs)
+</code></pre>
+<ul>
+<li>urls.py</li>
+</ul>
+<pre><code>from django.contrib import admin
+from django.urls import path
+from hotels.views import *
+
+urlpatterns = [
+    path(&quot;admin/&quot;, admin.site.urls),
+path('main/', main_page, name='main_page'),
+    path(&quot;guests/add/&quot;, AddGuests.as_view(), name='add_guest'),
+    path('guests/&lt;str:hotel_name&gt;', guests_list),
+    path(&quot;rooms/&quot;, ListRooms.as_view(), name='rooms'),
+    path(&quot;bookings/create&quot;, CreateBooking.as_view(), name='add_booking'),
+    path(&quot;bookings/my/&quot;, MyBookings, name='my_bookings'),
+    path(&quot;bookings/&lt;int:guest_passport&gt;/&quot;, UserBookings),
+    path(&quot;bookings/update/&lt;int:pk&gt;&quot;, UpdateBooking.as_view()),
+    path(&quot;bookings/delete/&lt;int:pk&gt;&quot;, DeleteBooking.as_view()),
+    path(&quot;feedbacks/add/&quot;, AddFeedback, name='give_feedback'),
+    path('feedbacks/',AllFeedbacks, name='all_feedbacks'),
+    path('hotel/', get_hotel, name='hotel'),
+]
+</code></pre>
+<ul>
+<li>forms.py</li>
+</ul>
+<pre><code>from django import forms
+from hotels.models import Feedback
+
+
+class CreateFeedback(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['booking', 'author', 'text', 'rate']
+</code></pre>
+<ul>
+<li>admin.py</li>
+</ul>
+<pre><code>from django.contrib import admin
+from hotels.models import *
+
+admin.site.register(Booking)
+admin.site.register(Hotel)
+admin.site.register(Guest)
+admin.site.register(Feedback)
+admin.site.register(Room)
+</code></pre>
+<ul>
+<li>views.py</li>
+</ul>
+<pre><code>from django.shortcuts import render, redirect
+from django.http import Http404
+from hotels.models import Hotel, Booking, Room, Guest, Feedback
+from django.views.generic import ListView, UpdateView, CreateView, DeleteView
+from hotels.forms import CreateFeedback
+
+
+# главная страница
+def main_page(request):
+    return render(request, 'main_page.html')
+
+
+# создание нового пользователя
+class AddGuests(CreateView):
+    model = Guest
+    fields = [
+        &quot;last_name&quot;,
+        &quot;first_name&quot;,
+        &quot;passport&quot;,
+    ]
+    template_name = &quot;add_guest.html&quot;
+    success_url = &quot;/main/&quot;
+
+
+# просмотр всех номеров
+class ListRooms(ListView):
+    model = Room
+    template_name = 'list_rooms.html'
+
+# создание бронирования
+class CreateBooking(CreateView):
+    model = Booking
+    fields = [
+        'hotel',
+        'room',
+        'guest',
+        'date_start',
+        'date_end'
+    ]
+    template_name = 'create_booking.html'
+    success_url = '/bookings/my/'
+
+# редактирование бронирования
+class UpdateBooking(UpdateView):
+    model = Booking
+    fields = ['room', 'date_start', 'date_end']
+    template_name = 'update_booking.html'
+    success_url = '/bookings/my/'
+
+
+# удаление бронирования
+class DeleteBooking(DeleteView):
+    model = Booking
+    template_name = 'delete_booking.html'
+    success_url = '/bookings/my/'
+
+
+# просмотр бронирований пользователя
+def UserBookings(request, guest_passport):
+    need_book = Booking.objects.filter(guest=guest_passport)
+    current_book = {&quot;object_list&quot;: need_book}
+    return render(request, 'users_bookings.html', current_book)
+
+
+# отбор паспорта для просмотра бронирований
+def MyBookings(request):
+    try:
+        passport = int(request.POST.get('passport_user'))
+        return redirect(f&quot;/bookings/{passport}/&quot;)
+    except:
+        return render(request, &quot;my_bookings.html&quot;)
+
+
+# написать комментарий
+def AddFeedback(request):
+    data = {}
+    form = CreateFeedback(request.POST)
+    if form.is_valid():
+        form.save()
+    data['form'] = form
+    return render(request, 'give_feedback.html', data)
+
+
+# посмотреть все комментарии
+def AllFeedbacks(request):
+    list_comments = {&quot;object_list&quot;: Feedback.objects.all()}
+    return render(request, 'all_feedbacks.html', list_comments)
+
+
+# таблица гостей отеля
+def get_hotel(request):
+    hotel = request.POST.get('hotel_name')
+    if hotel:
+        return redirect(f&quot;/guests/{hotel}&quot;)
+    else:
+        return render(request, 'hotel.html')
+
+
+def guests_list(request, hotel_name):
+    guest_in_hotel = Booking.objects.filter(hotel=hotel_name).values_list('guest')
+    nedeed_guests = Guest.objects.filter(passport__in=guest_in_hotel)
+    list_of_guests = {
+        &quot;object_list&quot;: nedeed_guests,
+        &quot;hotel_name&quot;: hotel_name}
+    return render(request, 'guests.html', list_of_guests)
+</code></pre>
+<h2 id="html-">HTML-код страниц</h2>
+<ul>
+<li>main_page.html</li>
+</ul>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;link href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;
+          integrity=&quot;sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC&quot; crossorigin=&quot;anonymous&quot;&gt;
+    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js&quot;
+            integrity=&quot;sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM&quot;
+            crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;
+    &lt;title&gt;Main&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class = 'd-flex align-items-center flex-column'&gt;
+        &lt;h1&gt; Список отелей, бронирований и гостей &lt;/h1&gt;
+
+    &lt;/div&gt;
+&lt;main class=&quot;container p-5&quot;&gt;
+    &lt;div class=&quot;row p-1&quot;&gt;
+        &lt;div class=&quot;col-sm-4&quot;&gt;
+            &lt;div class=&quot;card bg-success text-center&quot;&gt;
+                &lt;div class=&quot;card-body&quot;&gt;
+                    &lt;a href=&quot;{% url 'add_guest' %}&quot; class=&quot;btn btn-outline-light &quot;&gt;Регистрация гостя&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-4&quot;&gt;
+            &lt;div class=&quot;card bg-danger text-center&quot;&gt;
+                &lt;div class=&quot;card-body&quot;&gt;
+                    &lt;a href=&quot;{% url 'add_booking' %}&quot; class=&quot;btn btn-outline-light&quot;&gt;Забронировать&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-4&quot;&gt;
+            &lt;div class=&quot;card bg-success text-center&quot;&gt;
+                &lt;div class=&quot;card-body&quot;&gt;
+                    &lt;a href=&quot;{% url 'my_bookings' %}&quot; class=&quot;btn btn-outline-light&quot;&gt;Мои бронирования&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;row p-1&quot;&gt;
+        &lt;div class=&quot;col-sm-4&quot;&gt;
+            &lt;div class=&quot;card bg-danger text-center&quot;&gt;
+                &lt;div class=&quot;card-body&quot;&gt;
+                    &lt;a href=&quot;{% url 'rooms' %}&quot; class=&quot;btn btn-outline-light&quot;&gt;Комнаты&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-4&quot;&gt;
+            &lt;div class=&quot;card bg-success text-center&quot;&gt;
+                &lt;div class=&quot;card-body&quot;&gt;
+                    &lt;a href=&quot;{% url 'all_feedbacks' %}&quot; class=&quot;btn btn-outline-light&quot;&gt;Посмотреть отзывы&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-4&quot;&gt;
+            &lt;div class=&quot;card bg-danger text-center&quot;&gt;
+                &lt;div class=&quot;card-body&quot;&gt;
+                    &lt;a href=&quot;{% url 'give_feedback' %}&quot; class=&quot;btn btn-outline-light&quot;&gt;Оставить отзыв&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;row p-1 &quot;&gt;
+        &lt;div class=&quot;col-sm-4&quot;&gt;
+            &lt;div class=&quot;card bg-success text-center&quot;&gt;
+                &lt;div class=&quot;card-body&quot;&gt;
+                    &lt;a href=&quot;{% url 'hotel' %}&quot; class=&quot;btn btn-outline-light&quot;&gt;Клиенты отеля&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-sm-4&quot;&gt;
+            &lt;div class=&quot;card bg-danger text-center&quot;&gt;
+                &lt;div class=&quot;card-body&quot;&gt;
+                    &lt;a href=&quot;/admin/&quot; class=&quot;btn btn-outline-light&quot;&gt;Администратор&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+
+
+
+&lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<ul>
+<li>add_guest.html</li>
+</ul>
+<p>```&lt;!DOCTYPE html&gt;
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>New guest</title>
+</head></p>
+<body>
+<div class="container">
+      <div class="row justify-content-center">
+        <div class="col-8">
+          <h2 class="mt-2">Регистрация нового гостя</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <button type="submit" class="btn btn-success g-5 ">Зарегистрировать</button>
+                  </div>
+            </form>
+        </div>
+      </div>
+    </div>
+</body>
+<p></html></p>
+<pre><code>
+* all_feedbacks.html
+
+</code></pre>
+<!DOCTYPE html>
+<p><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>All feedbacks</title>
+</head></p>
+<body>
+<table class="table table-hover table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th scope="col">Отель</th>
+                <th scope="col">Номер комнаты</th>
+                <th scope="col">Автор</th>
+                <th scope="col">Дата заезда</th>
+                <th scope="col">Дата выезда</th>
+                <th scope="col">Комментарий</th>
+            </tr>
+        </thead>
+        {% for feedback in object_list %}
+        <tbody>
+            <tr>
+                <td>{{ feedback.booking.room.hotel.name }}</td>
+                <td>{{ feedback.booking.room.number }}</td>
+                <td>{{ feedback.author }}</td>
+                <td>{{ feedback.date_start }}</td>
+                <td>{{ feedback.date_end }}</td>
+                <td>{{ feedback.text }}</td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+</body>
+<p></html></p>
+<pre><code>
+* create_booking.html
+
+</code></pre>
+<!DOCTYPE html>
+<p><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>Create booking</title>
+</head></p>
+<body>
+<div class="container">
+      <div class="row justify-content-center">
+        <div class="col-8">
+          <h1 class="mt-2">Бронирование комнаты</h1>
+          <hr class="mt-0 mb-4">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-success g-5">Создать</button>
+                  </div>
+            </form>
+        </div>
+      </div>
+    </div>
+</body>
+<p></html></p>
+<pre><code>
+* delete_booking.html
+
+</code></pre>
+<!DOCTYPE html>
+<p><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>Delete your booking</title>
+</head></p>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-8">
+            <h2 class="mt-2">Удаление бронирования</h2>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div>
+                        <p class = "d-flex justify-content-end"></p>Вы действительно хотите удалить "{{ object }}"?</p>
+                    </div>
+                    <div>
+                        <input type="submit" value="Подтвердить" class="btn btn-danger p-2 "></input>
+                    </div>
+                </form>
+
+            </div>
+          </div>
+        </div>
+    </body>
+<p></html></p>
+<pre><code>
+* give_feedback.html
+
+</code></pre>
+<!DOCTYPE html>
+<p><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>Give your feedback!</title>
+</head></p>
+<body>
+<div class="container">
+      <div class="row justify-content-center">
+        <div class="col-8">
+          <h2 class="mt-2">Оставьте свой отзыв</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-success g-5">Отправить</button>
+                  </div>
+            </form>
+        </div>
+      </div>
+    </div>
+</body>
+<p></html></p>
+<pre><code>
+* guests.html
+
+</code></pre>
+<!DOCTYPE html>
+<p><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>All guests</title>
+</head></p>
+<body>
+<h2 class="d-flex justify-content-center"> Гости отеля {{ hotel_name }}</h2>
+    <table class="table table-hover table-bordered">
+        <thead class="table-success table-hover">
+            <tr>
+                <th scope="col">Фамилия</th>
+                <th scope="col">Имя</th>
+            </tr>
+        </thead>
+        {% for guest in object_list %}
+        <tbody>
+            <tr>
+                <td>{{ guest.last_name }}</td>
+                <td>{{ guest.first_name }}</td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+</body>
+<p></html></p>
+<pre><code>
+* hotel.html
+
+</code></pre>
+<!DOCTYPE html>
+<p><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>Hotel</title>
+</head></p>
+<body>
+ <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-8">
+          <h2 class="mt-2">Введите название отеля:</h2>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-flex p-2 flex-column ">
+                    <input type="text" name="hotel_name">
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-success g-5">Продолжить</button>
+                  </div>
+            </form>
+        </div>
+      </div>
+    </div>
+</body>
+<p></html></p>
+<pre><code>
+* list_rooms.html
+
+</code></pre>
+<!DOCTYPE html>
+<p><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>Номера в отеле</title>
+</head></p>
+<body>
+<table class="table table-hover table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th scope="col">Отель</th>
+                <th scope="col">Номер комнаты</th>
+                <th scope="col">Описание номера</th>
+                <th scope="col">Тип номера</th>
+                <th scope="col">Количество спальных мест</th>
+                <th scope="col">Стоимость номера за ночь</th>
+            </tr>
+        </thead>
+        {% for room in object_list %}
+        <tbody>
+            <tr>
+                <td>{{ room.hotel.name }}</td>
+                <td>{{ room.number }}</td>
+                <td>{{ room.description}}</td>
+                <td>{{ room.type_room}}</td>
+                <td>{{ room.beds }}</td>
+                <td>{{ room.price}}</td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+</body>
+<p></html></p>
+<pre><code>
+* my_bookings.html
+
+</code></pre>
+<!DOCTYPE html>
+<p><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>My bookings</title>
+</head></p>
+<body>
+<div class="container">
+      <div class="row justify-content-center">
+        <div class="col-8">
+          <h2 class="mt-2">Введите номер паспорта:</h2>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-flex p-2 flex-column ">
+                    <input type="text" name="passport_user">
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-success g-5">Продолжить</button>
+                  </div>
+            </form>
+        </div>
+      </div>
+    </div>
+</body>
+<p></html></p>
+<pre><code>
+* update_booking.html
+
+</code></pre>
+<!DOCTYPE html>
+<p><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>Update your booking</title>
+</head></p>
+<body>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-8">
+          <h2 class="mt-2">Изменение бронирования</h2>
+
+            {% block content %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-success g-5">Сохранить</button>
+                  </div>
+            </form>
+            {% endblock %}
+        </div>
+      </div>
+    </div>
+  </body>
+<p></html></p>
+<pre><code>
+* users_bookings.html
+
+</code></pre>
+<!DOCTYPE html>
+<p><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>All bookings</title>
+</head></p>
+<body>
+<table class="table table-striped table-bordered table-hover">
+        <thead class="table-success">
+            <tr>
+                <th scope="col">Номер заказа</th>
+                <th scope="col">Отель</th>
+                <th scope="col">Номер комнаты</th>
+                <th scope="col">Дата заезда</th>
+                <th scope="col">Дата выезда</th>
+                <th scope="col">Стоимость</th>
+                <th scope="col">Возможности</th>
+            </tr>
+        </thead>
+        {% for booking in object_list %}
+        <tbody>
+            <tr>
+                <td>{{ booking.id }}</td>
+                <td>{{ booking.room.hotel.name }}</td>
+                <td>{{ booking.room.number }}</td>
+                <td>{{ booking.date_start }}</td>
+                <td>{{ booking.date_end}}</td>
+                <td>{{ booking.total_price }}</td>
+                <td class="d-flex justify-content-start gap-2">
+                    <a href="/bookings/update/{{  booking.id }}">
+                        <button type="button" class="btn btn-outline-primary">Редактировать</button>
+                    </a>
+                    <a href="/bookings/delete/{{ booking.id }}">
+                        <button type="button" class="btn btn-outline-danger">Удалить</button>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+</body>
+<p></html>
+```</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
