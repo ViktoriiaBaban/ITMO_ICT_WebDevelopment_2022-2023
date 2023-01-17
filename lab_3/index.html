@@ -51,6 +51,10 @@
 <li>
     <a href="./" class="dropdown-item active">ЛР 3</a>
 </li>
+                                    
+<li>
+    <a href="../lab_4/" class="dropdown-item">ЛР 4</a>
+</li>
                                 </ul>
                             </li>
                             <li class="dropdown">
@@ -76,7 +80,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../pr_3_1/" class="nav-link">
+                                <a rel="next" href="../lab_4/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -151,17 +155,21 @@
 <li>список клиентов с указанием места жительства, которые проживали в те же дни,
 что и заданный клиент, в определенный период времени.</li>
 </ul>
-<p>Администратор должен иметь возможность выполнить следующие операции:
-- принять на работу или уволить служащего гостиницы;
-- изменить расписание работы служащего;
-- поселить или выселить клиента.</p>
+<p>Администратор должен иметь возможность выполнить следующие операции:</p>
+<ul>
+<li>принять на работу или уволить служащего гостиницы;</li>
+<li>изменить расписание работы служащего;</li>
+<li>поселить или выселить клиента.</li>
+</ul>
 <p>Необходимо предусмотреть также возможность автоматической выдачи отчета о
 работе гостиницы за указанный квартал текущего года. Такой отчет должен содержать
-следующие сведения:
-- число клиентов за указанный период в каждом номере;
-- количество номеров не каждом этаже;
-- общая сумма дохода за каждый номер;
-- суммарный доход по всей гостинице.</p>
+следующие сведения:</p>
+<ul>
+<li>число клиентов за указанный период в каждом номере;</li>
+<li>количество номеров не каждом этаже;</li>
+<li>общая сумма дохода за каждый номер;</li>
+<li>суммарный доход по всей гостинице.</li>
+</ul>
 <h2 id="_1">Модель БД</h2>
 <p><a href="https://ibb.co/KXNH7yt"><img src="https://i.ibb.co/TkK5RhQ/model-bd.png" alt="model-bd" border="0"></a></p>
 <h2 id="_2">Файлы с кодом</h2>
@@ -175,6 +183,9 @@
     patronymic = models.TextField(&quot;Отчество&quot;, max_length=20, null=True)
     city = models.TextField(&quot;Город&quot;, max_length=30, null=False)
 
+    def __str__(self):
+        return f&quot;{self.passport} {self.last_name} {self.first_name}&quot;
+
 
 class TypesRoom(models.Model):
     ROOM_TYPES = (
@@ -186,19 +197,21 @@ class TypesRoom(models.Model):
     count_beds = models.IntegerField(&quot;Кол-во спальных мест&quot;)
     price = models.FloatField(&quot;Цена&quot;)
 
+    def __str__(self):
+        return self.name_type
 
 class Room(models.Model):
     room_number = models.IntegerField(&quot;Номер комнаты&quot;, primary_key=True)
     room_type = models.ForeignKey(TypesRoom, on_delete=models.CASCADE, verbose_name=&quot;Тип номера&quot;)
     floor = models.PositiveIntegerField(&quot;Этаж&quot;)
-    phone_number = models.PositiveIntegerField(&quot;Номер телефона&quot;, max_length=11)
+    phone_number = models.PositiveIntegerField(&quot;Номер телефона&quot;)
 
 
 class Booking(models.Model):
     room_number = models.ForeignKey(Room, on_delete=models.CASCADE, related_name=&quot;booking_room&quot;)
     guest = models.ForeignKey(Guest, on_delete=models.CASCADE, related_name=&quot;booking_guest&quot;)
-    date_start = models.DateTimeField(&quot;Дата заезда&quot;)
-    date_end = models.DateTimeField(&quot;Дата выезда&quot;)
+    date_start = models.DateField(&quot;Дата заезда&quot;)
+    date_end = models.DateField(&quot;Дата выезда&quot;)
     total_price = models.PositiveIntegerField(&quot;Стоимость проживания&quot;, null=True)
 
     @property
@@ -219,6 +232,8 @@ class Workers(models.Model):
     first_name = models.TextField(&quot;Имя&quot;, max_length=20, null=False)
     patronymic = models.TextField(&quot;Отчество&quot;, max_length=20, null=True)
 
+    def __str__(self):
+        return f&quot;{self.last_name} {self.first_name}&quot;
 
 class Cleaning(models.Model):
     WEEK_DAYS = (
@@ -239,6 +254,7 @@ class Cleaning(models.Model):
 <li>urls.py</li>
 </ul>
 <pre><code>urlpatterns = [
+    path(&quot;guest/new&quot;, CreateGuest.as_view()),
     path(&quot;guest/all&quot;, AllGuests.as_view()),
     path(&quot;guest/&lt;str:city&gt;&quot;, GuestsByCity.as_view()),
     path(&quot;guest/&lt;int:room_number&gt;/&lt;str:period_date_start&gt;/&lt;str:period_date_end&gt;&quot;, GuestsByPeriod.as_view()),
@@ -246,16 +262,20 @@ class Cleaning(models.Model):
 
     path(&quot;workers/all&quot;, AllWorkers.as_view()),
     path(&quot;workers/&lt;int:guest_passport&gt;/&lt;str:day_of_week&gt;&quot;, GetWorkerByDayAndClient.as_view()),
+    path(&quot;workers/new&quot;, CreateWorker.as_view()),
+    path(&quot;workers/&lt;int:pk&gt;&quot;, DestroyWorker.as_view()),
+
+    path(&quot;cleaning/all&quot;, AllCleaning.as_view()),
+    path(&quot;cleaning/new&quot;, CreateCleaning.as_view()),
+    path(&quot;cleaning/&lt;int:pk&gt;&quot;, UpdateCleaning.as_view()),
 
     path(&quot;booking/all&quot;, AllBookings.as_view()),
+    path(&quot;booking/new&quot;, CreateBooking.as_view()),
+    path(&quot;booking/&lt;int:pk&gt;&quot;, DeleteBooking.as_view()),
 
     path(&quot;rooms/free&quot;, FreeRoomsCount.as_view()),
 
     path(&quot;report/&lt;int:quarter&gt;&quot;, QReport.as_view()),
-
-    #path(&quot;guest/new&quot;, CreateGuest.as_view()),
-    #path(&quot;workers/new&quot;, CreateWorker.as_view()),
-    #path(&quot;booking/new&quot;, CreateBooking.as_view()),
 ]
 </code></pre>
 <ul>
@@ -353,18 +373,21 @@ class GuestsSamePeriods(APIView):
 #квартальный отчет
 class QReport(APIView):
     def get(self, *args, **kwargs):
+
+        year = datetime.today().year
+
         if kwargs[&quot;quarter&quot;] == 1:
-            filter = Q(date_start__gte=date(datetime.today().year, 1, 1),
-                         date_start__lt=date(datetime.today().year, 3, 31))
+            filter = Q(date_start__gte=date(year, 1, 1),
+                       date_start__lte=date(year, 3, 31))
         elif kwargs[&quot;quarter&quot;] == 2:
-            filter = Q(date_start__gte=date(datetime.today().year, 4, 1),
-                         date_start__lt=date(datetime.today().year, 6, 30))
+            filter = Q(date_start__gte=date(year, 4, 1),
+                       date_start__lte=date(year, 6, 30))
         elif kwargs[&quot;quarter&quot;] == 3:
-            filter = Q(date_start__gte=date(datetime.today().year, 7, 1),
-                         date_start__lt=date(datetime.today().year, 9, 30))
+            filter = Q(date_start__gte=date(year, 7, 1),
+                       date_start__lte=date(year, 9, 30))
         elif kwargs[&quot;quarter&quot;] == 4:
-            filter = Q(date_start__gte=date(datetime.today().year, 10, 1),
-                         date_start__lt=date(datetime.today().year, 12, 31))
+            filter = Q(date_start__gte=date(year, 10, 1),
+                       date_start__lte=date(year, 12, 31))
 
         floors = []
         for f in Room.objects.values(&quot;floor&quot;).annotate(Count(&quot;room_number&quot;)):
@@ -373,13 +396,16 @@ class QReport(APIView):
         rooms = []
         for room in Room.objects.all():
             counter = 0
+            room_profit = 0
             for booking in room.booking_room.filter(filter):
                 counter += 1
+                room_profit += booking.total_price
+                print(booking, ' ', counter, ' ', room_profit)
             rooms.append(
                 {
                     &quot;name&quot;: room.room_number,
                     &quot;count&quot;: counter,
-                    &quot;profit&quot;: booking.total_price
+                    &quot;profit&quot;: room_profit
                 }
             )
 
@@ -392,14 +418,13 @@ class QReport(APIView):
         )
 
 
-'''
+
 # создание гостя
 class CreateGuest(CreateAPIView, ListAPIView):
     queryset = Guest.objects.all()
-    serializer_class = CreateGuestSerializer
+    serializer_class = GuestSerializer
 
-
-# создание бронирования
+# создание бронирования / поселение гостя
 class CreateBooking(CreateAPIView):
     serializer_class = CreateBookingSerializer
     permission_classes = [IsAuthenticated]
@@ -423,13 +448,41 @@ class CreateBooking(CreateAPIView):
         serializer.save()
         return Response(&quot;Бронирование создано&quot;, status=status.HTTP_201_CREATED)
 
+# удаление бронирования / выселение гостя
+class DeleteBooking(DestroyAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+    permission_classes = [IsAuthenticated]
+
 
 # создание работника
 class CreateWorker(CreateAPIView, ListAPIView):
     queryset = Workers.objects.all()
-    serializer_class = CreateWorkerSerializer
+    serializer_class = WorkersSerializer
     permission_classes = [IsAuthenticated]
-'''
+
+# увольнение работника
+class DestroyWorker(DestroyAPIView):
+    queryset = Workers.objects.all()
+    serializer_class = WorkersSerializer
+    permission_classes = [IsAuthenticated]
+
+# просмотр графика работы служащих
+class AllCleaning(ListAPIView):
+    queryset = Cleaning.objects.all()
+    serializer_class = CleaningSerializer
+
+# изменение графика работы служащих
+class CreateCleaning(CreateAPIView, ListAPIView):
+    queryset = Cleaning.objects.all()
+    serializer_class = CleaningSerializer
+    permission_classes = [IsAuthenticated]
+
+class UpdateCleaning(RetrieveUpdateDestroyAPIView):
+    queryset = Cleaning.objects.all()
+    serializer_class = CleaningSerializer
+    permission_classes = [IsAuthenticated]
+
 </code></pre>
 <ul>
 <li>serializers.py</li>
@@ -449,15 +502,6 @@ class WorkersSerializer(serializers.ModelSerializer):
         model = Workers
         fields = &quot;__all__&quot;
 
-class CreateGuestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Guest
-        fields = &quot;__all__&quot;
-
-class CreateWorkerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Workers
-        fields = &quot;__all__&quot;
 
 class CreateBookingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -483,11 +527,17 @@ class GuestsByPeriodSerializer(serializers.ModelSerializer):
         model = Booking
         fields = [&quot;guest&quot;]
 
-class CleaningSerializer(serializers.ModelSerializer):
+class CleaningWorkerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cleaning
         fields = ['id_worker']
+
+class CleaningSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Cleaning
+        fields = &quot;__all__&quot;
 </code></pre>
 <ul>
 <li>admin.py</li>
