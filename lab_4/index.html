@@ -116,6 +116,26 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#router" class="nav-link">* router</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#api" class="nav-link">* api</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#stores" class="nav-link">* stores</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#components" class="nav-link">* components</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#views" class="nav-link">* views</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -125,6 +145,7 @@
 
 <h1 id="4">Лабораторная работа 4</h1>
 <h2 id="_1">Вариант</h2>
+<p>Взят фариант с предмета "Фронтенд-разработка": сайт с поиском мероприятий.</p>
 <h2 id="_2">Файлы с кодом (бэкенд)</h2>
 <ul>
 <li>models.py</li>
@@ -284,7 +305,7 @@ class UserEventsSerializer(serializers.ModelSerializer):
         fields = (&quot;id&quot;, &quot;event_id&quot;)
 </code></pre>
 <h2 id="vuejs">Файлы с кодом Vue.js</h2>
-<h3 id="router">router</h3>
+<h2 id="router">* router</h2>
 <ul>
 <li>index.js</li>
 </ul>
@@ -330,7 +351,7 @@ const router = createRouter({
 
 export default router
 </code></pre>
-<h3 id="api">api</h3>
+<h2 id="api">* api</h2>
 <ul>
 <li>index.js</li>
 </ul>
@@ -507,9 +528,9 @@ export default UserAPI
 
 export default UsersEventsAPI
 </code></pre>
-<h3 id="stores">stores</h3>
+<h2 id="stores">* stores</h2>
 <ul>
-<li>index.py</li>
+<li>index.js</li>
 </ul>
 <pre><code>import { persist } from 'pinia-persists'
 import { createPinia } from 'pinia'
@@ -652,7 +673,7 @@ const useUserEventsStore = defineStore('user_events', {
 
 export default useUserEventsStore
 </code></pre>
-<h3 id="components">components</h3>
+<h2 id="components">* components</h2>
 <ul>
 <li>Header.vue - Шапка сайта</li>
 </ul>
@@ -976,7 +997,7 @@ export default {
 &lt;/script&gt;
 </code></pre>
 <ul>
-<li>EventCard - карточка события</li>
+<li>EventCard.vue - карточка события</li>
 </ul>
 <pre><code>&lt;template&gt;
   &lt;div class=&quot;col-4&quot;&gt;
@@ -1258,7 +1279,7 @@ export default {
 }
 &lt;/script&gt;
 </code></pre>
-<h3 id="views">views</h3>
+<h2 id="views">* views</h2>
 <ul>
 <li>MainView.vue - главная страница с фильтрацией событий</li>
 </ul>
